@@ -3,6 +3,8 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import MainNav from "./MainNav";
 
+export const dynamic = "force-dynamic";
+
 export default async function MainLayout({
   children,
 }: {

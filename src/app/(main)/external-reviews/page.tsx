@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function ExternalReviewsPage() {
   let list: { id: number; memberId: number; title: string; body: string; source: string; createdAt: Date; member?: { name: string } | null }[];
   try {
