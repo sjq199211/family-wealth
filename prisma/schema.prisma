@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id           Int      @id @default(autoincrement())
+  name         String
+  loginName    String   @unique
+  passwordHash String
+  role         String   @default("member") // "member" | "weekly_reporter"
+  createdAt    DateTime @default(now())
+  reports           Report[]
+  tradingNotes      TradingNote[]
+  tradingResults    TradingResult[]
+  stockStrategies   StockStrategy[]
+  externalReviews     ExternalReview[]
+  notificationsTo     Notification[]     @relation("NotificationTo")
+  notificationsFrom   Notification[]     @relation("NotificationFrom")
+  tradingNoteLikes    TradingNoteLike[]
+  tradingNoteComments TradingNoteComment[]
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  memberId    Int
+  member      Member   @relation(fields: [memberId], references: [id])
+  title       String
+  body        String   @default("")
+  isWeekly    Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  attachments ReportAttachment[]
+}
+
+model ReportAttachment {
+  id           Int    @id @default(autoincrement())
+  reportId     Int
+  report       Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  type         String // "image" | "file"
+  filePath     String
+  originalName String
+  createdAt    DateTime @default(now())
+}
+
+model TradingNote {
+  id        Int      @id @default(autoincrement())
+  memberId  Int
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  content   String
+  noteDate  DateTime
+  createdAt DateTime @default(now())
+  likes    TradingNoteLike[]
+  comments TradingNoteComment[]
+}
+
+model TradingNoteLike {
+  id        Int        @id @default(autoincrement())
+  memberId  Int
+  member    Member     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  noteId    Int
+  note      TradingNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+  @@unique([memberId, noteId])
+}
+
+model TradingNoteComment {
+  id        Int        @id @default(autoincrement())
+  memberId  Int
+  member    Member     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  noteId    Int
+  note      TradingNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime   @default(now())
+}
+
+model TradingResult {
+  id        Int      @id @default(autoincrement())
+  memberId  Int
+  member    Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  tradeDate DateTime
+  symbol    String  @default("")
+  side      String  @default("") // "buy" | "sell" | ""
+  amount    Float?
+  pnl       Float?
+  note      String  @default("")
+  createdAt DateTime @default(now())
+}
+
+model StockStrategy {
+  id             Int      @id @default(autoincrement())
+  memberId       Int
+  member         Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  symbol         String   // 标的
+  entryLevel     Float?   // 入场位
+  addPosition    Float?   // 加仓位
+  reducePosition Float?   // 减仓位
+  stopLoss       Float?   // 止损位
+  takeProfit     Float?   // 出场位
+  positionMgmt   String   @default("") // 仓位管理
+  difficulty     Int      // 1-5 星操作难度
+  trendComment   String   @default("") // 个股分析，支持 @
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ExternalReview {
+  id                   Int      @id @default(autoincrement())
+  memberId             Int
+  member               Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  title                String
+  body                 String   @default("") // 支持 @
+  source               String   @default("") // 来源
+  wordFilePath         String?  // 上传的 Word 原文相对路径
+  wordFileName         String?  // 原始文件名，用于下载显示
+  aiSummary            String?  // AI 总结的重点
+  aiRecommendedSymbols String?  // 推荐标的 JSON 数组，如 ["立讯精密(002475)"]
+  createdAt            DateTime @default(now())
+}
+
+model Notification {
+  id            Int      @id @default(autoincrement())
+  toMemberId    Int
+  toMember      Member   @relation("NotificationTo", fields: [toMemberId], references: [id], onDelete: Cascade)
+  fromMemberId  Int
+  fromMember    Member   @relation("NotificationFrom", fields: [fromMemberId], references: [id], onDelete: Cascade)
+  sourceType    String   // "weekly_strategy" | "stock_strategy" | "trading_note" | "external_review"
+  sourceId      Int
+  message       String   @default("")
+  readAt        DateTime?
+  createdAt     DateTime @default(now())
+}

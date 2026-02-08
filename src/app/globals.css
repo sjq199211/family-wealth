@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* 华尔街 / 理性商业风：深海军蓝、炭灰、金棕点缀 */
+:root {
+  --bg-page: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-nav: #0f172a;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #b8860b;
+  --accent-hover: #996f09;
+  --accent-muted: #d4a84b;
+  --success: #059669;
+  --danger: #dc2626;
+  /* 股票：红盈绿亏 */
+  --profit: #dc2626;
+  --loss: #059669;
+}
+
+@theme inline {
+  --color-background: var(--bg-page);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", monospace;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* 全站背景图：股票/交易主题（Unsplash） */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1920&q=80") center/cover no-repeat;
+  opacity: 0.08;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 标题更克制的字间距 */
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* 链接与强调统一用金棕 */
+a.text-accent,
+.text-accent {
+  color: var(--accent);
+}
+a.text-accent:hover {
+  color: var(--accent-hover);
+}
