@@ -1,6 +1,7 @@
 import path from "path";
 import mammoth from "mammoth";
 import { PDFParse } from "pdf-parse";
+// @ts-ignore - word-extractor has no type definitions
 import WordExtractor from "word-extractor";
 
 const docExtractor = new WordExtractor();
