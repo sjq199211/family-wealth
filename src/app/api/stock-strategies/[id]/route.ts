@@ -55,13 +55,14 @@ export async function PATCH(
     include: { member: { select: { name: true } } },
   });
 
-  if (data.trendComment !== undefined && data.trendComment) {
+  const trendComment = data.trendComment;
+  if (typeof trendComment === "string" && trendComment) {
     await createMentionNotifications(
       user.id,
       "stock_strategy",
       updated.id,
       `${updated.member.name} 在个股策略「${updated.symbol}」中提到了你`,
-      data.trendComment
+      trendComment
     );
   }
   return Response.json(updated);
